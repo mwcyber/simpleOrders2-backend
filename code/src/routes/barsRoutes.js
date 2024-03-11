@@ -1,8 +1,11 @@
 // src/routes/barsRoutes.js
 const express = require('express');
 const barController = require('../controllers/barController');
+const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
+
+router.use('/api/v1/bars', authMiddleware.protectEndpoints);
 
 router.get('/api/v1/bars', barController.getAllBars);
 router.get('/api/v1/bars/:id', barController.getBarById);
