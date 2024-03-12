@@ -17,7 +17,7 @@ class BarRepository {
   }
 
   async updateBar(barId, barData) {
-    return Bar.findByIdAndUpdate(barId, barData, { new: true });
+    return Bar.findByIdAndUpdate(barId, barData, { new: true }); //{ new: true }: Opzionale, specifica di restituire il documento aggiornato.
   }
 
   async deleteBar(barId) {

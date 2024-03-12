@@ -2,9 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const barsRoutes = require('./routes/barsRoutes');
-const authRoutes = require('./routes/authRoutes');
-const authMiddleware = require('./middleware/authMiddleware');
+const mainRoutes = require('./routes/mainRoutes');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -16,9 +14,7 @@ mongoose.connect('mongodb://localhost:27017/simpleorders', {
   useUnifiedTopology: true,
 });
 
-
-app.use(barsRoutes);
-app.use(authRoutes);
+app.use(mainRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
