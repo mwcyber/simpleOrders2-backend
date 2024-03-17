@@ -3,11 +3,12 @@ const orderService = require('../services/orderService');
 
 class orderController {
     async getAllorders(req, res) {
+        const userId = req.user.userId;
         const { page = 1, pageSize = 50 } = req.query;
         const pagination = { page: parseInt(page), pageSize: parseInt(pageSize) };
 
         try {
-            const { orders, totalCount, totalPages } = await orderService.getAllorders(pagination);
+            const { orders, totalCount, totalPages } = await orderService.getAllOrders(userId, pagination);
 
             if (orders.length === 0) {
                 res.status(404).json({ message: 'orders not found' });
@@ -31,10 +32,11 @@ class orderController {
         }
     }
 
-    async getorderById(req, res) {
+    async getOrderById(req, res) {
+        const userId = req.user.userId;
         const { id } = req.params;
         try {
-            const order = await orderService.getorderById(id);
+            const order = await orderService.getOrderById(userId, id);
             if (order.length === 0) {
                 res.status(404).json({ message: 'orders not found' });
             } else {
@@ -45,48 +47,49 @@ class orderController {
         }
     }
 
-    async createorder(req, res) {
+    async createOrder(req, res) {
         const orderData = req.body;
         try {
-            const createdorder = await orderService.createorder(orderData);
+            const createdorder = await orderService.creatOrder(orderData);
             res.status(201).json(createdorder);
         } catch (error) {
             res.status(400).json({ message: 'Error creating order' });
         }
     }
 
-    async updateorder(req, res) {
+    async updateOrder(req, res) {
+        const userId = req.user.userId;
         const { id } = req.params;
         const orderData = req.body;
         try {
-            const updatedorder = await orderService.updateorder(id, orderData);
+            const updatedorder = await orderService.updateOrder(userId, id, orderData);
             res.status(200).json(updatedorder);
         } catch (error) {
             res.status(404).json({ message: 'order not found' });
         }
     }
 
-    async deleteorder(req, res) {
+    async deleteOrder(req, res) {
         const { id } = req.params;
         try {
-            await orderService.deleteorder(id);
+            await orderService.deleteOrder(userId, id);
             res.status(204).send();
         } catch (error) {
             res.status(404).json({ message: 'order not found' });
         }
     }
 
-    async searchorders(req, res) {
+    async searchOrders(req, res) {
         const { page = 1, pageSize = 50 } = req.query;
-        const { name, type, address, phone, opening_hours } = req.body;
+        const { orderId, userId, createdAt, modifiedAt, barId, productId, friendId, quantity } = req.body;
 
         const pagination = { page: parseInt(page), pageSize: parseInt(pageSize) };
-        const queryParams = { name, type, address, phone, opening_hours };
+        const queryParams = { orderId, userId, createdAt, modifiedAt, barId, productId, friendId, quantity };
 
         // Verifica che almeno un parametro di ricerca sia presente
         if (Object.values(queryParams).some(value => value !== undefined)) {
             try {
-                const { orders, totalCount, totalPages } = await orderService.searchorders(queryParams, pagination);
+                const { orders, totalCount, totalPages } = await orderService.searchOrders(queryParams, pagination);
 
                 if (orders.length === 0) {
                     res.status(404).json({ message: 'No orders found matching the search criteria' });

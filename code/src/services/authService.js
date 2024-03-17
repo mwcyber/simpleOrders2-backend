@@ -27,7 +27,7 @@ class AuthService {
   }
 
   generateToken(user) {
-    return authMiddleware.generateToken({ user_id: user.user_id, username: user.username });
+    return authMiddleware.generateToken({ user_id: user.userId, username: user.username });
   }
 }
 

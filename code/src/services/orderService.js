@@ -2,54 +2,67 @@
 const orderRepository = require('../repositories/orderRepository');
 
 class orderService {
-  async getAllorders(pagination) {
+  async getAllOrders(userId, pagination) {
 
-    const orders = await orderRepository.getAllorders(pagination);
-    const totalCount = await orderRepository.getordersCount();
+    const orders = await orderRepository.getAllOrders(userId, pagination);
+    const totalCount = await orderRepository.getOrdersCount();
 
     const totalPages = Math.ceil(totalCount / pagination.pageSize);
 
     return { orders, totalCount, totalPages };
   }
 
-  async getorderById(orderId) {
-    return orderRepository.getorderById(orderId);
+  async getOrderById(userId, orderId) {
+    return orderRepository.getOrderById(userId, orderId);
   }
 
-  async createorder(orderData) {
-    return orderRepository.createorder(orderData);
+  async createOrder(orderData) {
+    try {
+      const { userId, barId, orders } = orderData;
+      const createdOrders = [];
+  
+      for (const order of orders) {
+        const { productId, friendId, quantity } = order;
+        const newOrder = { userId, barId, productId, friendId, quantity };
+        const createdOrder = await orderRepository.createOrder(newOrder);
+        createdOrders.push(createdOrder);
+      }
+  
+      return createdOrders;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  async updateorder(orderId, orderData) {
-    return orderRepository.updateorder(orderId, orderData);
+  async updateOrder(userId, orderId, orderData) {
+    return orderRepository.updateOrder(userId, orderId, orderData);
   }
 
-  async deleteorder(orderId) {
-    return orderRepository.deleteorder(orderId);
+  async deleteOrder(userId, orderId) {
+    return orderRepository.deleteOrder(userId, orderId);
   }
 
-  async searchorders(queryParams, pagination) {
+  async searchOrders(userId, queryParams, pagination) {
     const searchCriteria = {};
 
-    // Aggiungo i criteri di ricerca solo per i parametri specificati
-    if (queryParams.name) {
-      searchCriteria.name = new RegExp(queryParams.name, 'i');
-    }
-    if (queryParams.type) {
-      searchCriteria.type = new RegExp(queryParams.type, 'i');
-    }
-    if (queryParams.address) {
-      searchCriteria.address = new RegExp(queryParams.address, 'i');
-    }
-    if (queryParams.phone) {
-      searchCriteria.phone = new RegExp(queryParams.phone, 'i');
-    }
-    if (queryParams.opening_hours) {
-      searchCriteria.opening_hours = new RegExp(queryParams.opening_hours, 'i');
-    }
+    // Mappa dei campi che possono essere utilizzati come criteri di ricerca
+    const searchFields = ['orderId', 'userId', 'createdAt', 'modifiedAt', 'barId', 'productId', 'friendId', 'quantity'];
 
-    const orders = await orderRepository.searchorders(searchCriteria, pagination);
-    const totalCount = await orderRepository.getordersCount(searchCriteria);
+    // Aggiungo i criteri di ricerca solo per i parametri specificati
+    searchFields.forEach(field => {
+        if (queryParams[field]) {
+            // Aggiungo il criterio con l'espressione regolare per la ricerca case-insensitive
+            searchCriteria[field] = new RegExp(queryParams[field], 'i');
+        }
+    });
+
+    // Recupero gli oggetti corrispondendi ai criteri di ricerca
+    const orders = await orderRepository.searchOrders(userId, searchCriteria, pagination);
+
+    // Recupero il numero totale degli oggetti
+    const totalCount = await orderRepository.getOrdersCount(searchCriteria);
+    
+    // Calcolo il numero totale di pagine con totale/dimensione pagina
     const totalPages = Math.ceil(totalCount / pagination.pageSize);
 
     return { orders, totalCount, totalPages };

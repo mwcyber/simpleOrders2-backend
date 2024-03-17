@@ -2,9 +2,9 @@
 const barRepository = require('../repositories/barRepository');
 
 class BarService {
-  async getAllBars(pagination) {
+  async getAllBars(userId, pagination) {
 
-    const bars = await barRepository.getAllBars(pagination);
+    const bars = await barRepository.getAllBars(userId, pagination);
     const totalCount = await barRepository.getBarsCount();
 
     const totalPages = Math.ceil(totalCount / pagination.pageSize);
@@ -12,44 +12,43 @@ class BarService {
     return { bars, totalCount, totalPages };
   }
 
-  async getBarById(barId) {
-    return barRepository.getBarById(barId);
+  async getBarById(userId, barId) {
+    return barRepository.getBarById(userId, barId);
   }
 
   async createBar(barData) {
     return barRepository.createBar(barData);
   }
 
-  async updateBar(barId, barData) {
-    return barRepository.updateBar(barId, barData);
+  async updateBar(userId, barId, barData) {
+    return barRepository.updateBar(userId, barId, barData);
   }
 
-  async deleteBar(barId) {
-    return barRepository.deleteBar(barId);
+  async deleteBar(userId, barId) {
+    return barRepository.deleteBar(userId, barId);
   }
 
-  async searchBars(queryParams, pagination) {
+  async searchBars(userId, queryParams, pagination) {
     const searchCriteria = {};
 
-    // Aggiungo i criteri di ricerca solo per i parametri specificati
-    if (queryParams.name) {
-      searchCriteria.name = new RegExp(queryParams.name, 'i');
-    }
-    if (queryParams.type) {
-      searchCriteria.type = new RegExp(queryParams.type, 'i');
-    }
-    if (queryParams.address) {
-      searchCriteria.address = new RegExp(queryParams.address, 'i');
-    }
-    if (queryParams.phone) {
-      searchCriteria.phone = new RegExp(queryParams.phone, 'i');
-    }
-    if (queryParams.opening_hours) {
-      searchCriteria.opening_hours = new RegExp(queryParams.opening_hours, 'i');
-    }
+    // Mappa dei campi che possono essere utilizzati come criteri di ricerca
+    const searchFields = ['name', 'type', 'address', 'phone', 'openingHours'];
 
-    const bars = await barRepository.searchBars(searchCriteria, pagination);
+    // Aggiungo i criteri di ricerca solo per i parametri specificati
+    searchFields.forEach(field => {
+        if (queryParams[field]) {
+            // Aggiungo il criterio con l'espressione regolare per la ricerca case-insensitive
+            searchCriteria[field] = new RegExp(queryParams[field], 'i');
+        }
+    });
+
+    // Recupero gli oggetti corrispondendi ai criteri di ricerca
+    const bars = await barRepository.searchBars(userId, searchCriteria, pagination);
+    
+    // Recupero il numero totale degli oggetti
     const totalCount = await barRepository.getBarsCount(searchCriteria);
+    
+    // Calcolo il numero totale di pagine con totale/dimensione pagina
     const totalPages = Math.ceil(totalCount / pagination.pageSize);
 
     return { bars, totalCount, totalPages };

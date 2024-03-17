@@ -6,6 +6,7 @@ const barRoutes = require('./barsRoutes');
 const productRoutes = require('./productsRoutes');
 const orderRoutes = require('./ordersRoutes');
 const friendRoutes = require('./friendsRoutes');
+const userRoutes = require('./userRoutes');
 
 const router = express.Router();
 
@@ -20,5 +21,6 @@ router.use('/api/v1/bars', barRoutes);
 router.use('/api/v1/products', productRoutes);
 router.use('/api/v1/orders', orderRoutes);
 router.use('/api/v1/friends', friendRoutes);
+router.use('/api/v1/users', userRoutes);
 
 module.exports = router;

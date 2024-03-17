@@ -2,36 +2,48 @@
 const Order = require('../models/order');
 
 class OrderRepository {
-  async getAllOrders(pagination) {
-    return Order.find()
+  async getAllOrders(userId, pagination) {
+    return Order.find({ $or: [{ userId: userId }, { share: true }] })
         .skip((pagination.page - 1) * pagination.pageSize)
         .limit(pagination.pageSize);
   }
 
-  async getOrderById(orderId) {
-    return Order.findById(orderId);
+  async getOrderById(userId, orderId) {
+    return Order.findOne({ _id: orderId, $or: [{ userId: userId }, { share: true }] });
   }
 
   async createOrder(orderData) {
     return Order.create(orderData);
   }
 
-  async updateOrder(orderId, orderData) {
+  async updateOrder(userId, orderId, orderData) {
+    // Verifica se l'ordine appartiene all'utente corrente prima di aggiornarlo
+    const existingOrder = await Order.findOne({ _id: orderId, userId: userId });
+    if (!existingOrder) {
+      throw new Error('Not authorized');
+    }
+
     return Order.findByIdAndUpdate(orderId, orderData, { new: true });
   }
 
-  async deleteOrder(orderId) {
+  async deleteOrder(userId, orderId) {
+    // Verifica se l'ordine appartiene all'utente corrente prima di eliminarlo
+    const existingOrder = await Order.findOne({ _id: orderId, userId: userId });
+    if (!existingOrder) {
+      throw new Error('Not authorized');
+    }
+
     return Order.findByIdAndDelete(orderId);
   }
 
-  async searchOrders(searchCriteria, pagination) {
-    return Order.find(searchCriteria)
+  async searchOrders(userId, searchCriteria, pagination) {
+    return Order.find({ userId, ...searchCriteria })
       .skip((pagination.page - 1) * pagination.pageSize)
       .limit(pagination.pageSize);
   }
 
-  async getOrdersCount() {
-    return Order.countDocuments();
+  async getOrdersCount(userId) {
+    return Order.countDocuments({ userId });
   }
 }
 

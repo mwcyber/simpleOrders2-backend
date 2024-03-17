@@ -11,6 +11,7 @@ class AuthController {
 
             // Verifico se l'utente esiste già
             const existingUser = await userRepository.getUserByUsername(username);
+
             if (existingUser) {
                 return res.status(400).json({ message: 'Username already exists' });
             }
@@ -19,9 +20,11 @@ class AuthController {
             await authService.registerUser({ username, password });
 
             res.status(201).json({ message: 'Registration successful' });
+
         } catch (error) {
-            console.error(error);
+            
             res.status(500).json({ message: 'Internal server error' });
+        
         }
     }
 
@@ -44,12 +47,14 @@ class AuthController {
             }
 
             // Generazione del token JWT
-            const token = authMiddleware.generateToken({ username: user.username });
+            const token = authMiddleware.generateToken({ userId: user._id });
 
             res.status(200).json({ token });
+
         } catch (error) {
-            console.error(error);
+            
             res.status(500).json({ message: 'Internal server error' });
+        
         }
     }
 }

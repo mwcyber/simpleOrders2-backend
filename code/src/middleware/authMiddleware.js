@@ -11,9 +11,13 @@ function generateToken(payload) {
 
 function verifyToken(token) {
   try {
+
     return jwt.verify(token, secretKey);
+
   } catch (error) {
+
     return null;
+
   }
 }
 
@@ -31,6 +35,7 @@ function protectEndpoints(req, res, next) {
   }
 
   req.user = decodedToken;
+
   next();
 }
 

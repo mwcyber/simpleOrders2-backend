@@ -2,12 +2,13 @@
 const friendService = require('../services/friendService');
 
 class friendController {
-    async getAllfriends(req, res) {
+    async getAllFriends(req, res) {
+        const userId = req.user.userId;
         const { page = 1, pageSize = 50 } = req.query;
         const pagination = { page: parseInt(page), pageSize: parseInt(pageSize) };
 
         try {
-            const { friends, totalCount, totalPages } = await friendService.getAllfriends(pagination);
+            const { friends, totalCount, totalPages } = await friendService.getAllfriends(userId, pagination);
 
             if (friends.length === 0) {
                 res.status(404).json({ message: 'friends not found' });
@@ -31,10 +32,11 @@ class friendController {
         }
     }
 
-    async getfriendById(req, res) {
+    async getFriendById(req, res) {
+        const userId = req.user.userId;
         const { id } = req.params;
         try {
-            const friend = await friendService.getfriendById(id);
+            const friend = await friendService.getfriendById(userId, id);
             if (friend.length === 0) {
                 res.status(404).json({ message: 'friends not found' });
             } else {
@@ -45,48 +47,52 @@ class friendController {
         }
     }
 
-    async createfriend(req, res) {
+    async createFriend(req, res) {
+        const userId = req.user.userId;
         const friendData = req.body;
         try {
-            const createdfriend = await friendService.createfriend(friendData);
+            const createdfriend = await friendService.createfriend(userId, friendData);
             res.status(201).json(createdfriend);
         } catch (error) {
             res.status(400).json({ message: 'Error creating friend' });
         }
     }
 
-    async updatefriend(req, res) {
+    async updateFriend(req, res) {
+        const userId = req.user.userId;
         const { id } = req.params;
         const friendData = req.body;
         try {
-            const updatedfriend = await friendService.updatefriend(id, friendData);
+            const updatedfriend = await friendService.updatefriend(userId, id, friendData);
             res.status(200).json(updatedfriend);
         } catch (error) {
             res.status(404).json({ message: 'friend not found' });
         }
     }
 
-    async deletefriend(req, res) {
+    async deleteFriend(req, res) {
+        const userId = req.user.userId;
         const { id } = req.params;
         try {
-            await friendService.deletefriend(id);
+            await friendService.deletefriend(userId, id);
             res.status(204).send();
         } catch (error) {
             res.status(404).json({ message: 'friend not found' });
         }
     }
 
-    async searchfriends(req, res) {
+    async searchFriends(req, res) {
+        const userId = req.user.userId;
         const { page = 1, pageSize = 50 } = req.query;
-        const { name, type, address, phone, opening_hours } = req.body;
+        const { nickname } = req.body;
 
         const pagination = { page: parseInt(page), pageSize: parseInt(pageSize) };
-        const queryParams = { name, type, address, phone, opening_hours };
+        const queryParams = { nickname };
 
         // Verifica che almeno un parametro di ricerca sia presente
         if (Object.values(queryParams).some(value => value !== undefined)) {
             try {
-                const { friends, totalCount, totalPages } = await friendService.searchfriends(queryParams, pagination);
+                const { friends, totalCount, totalPages } = await friendService.searchfriends(userId, queryParams, pagination);
 
                 if (friends.length === 0) {
                     res.status(404).json({ message: 'No friends found matching the search criteria' });

@@ -2,54 +2,53 @@
 const friendRepository = require('../repositories/friendRepository');
 
 class friendService {
-  async getAllfriends(pagination) {
+  async getAllfriends(userId, pagination) {
 
-    const friends = await friendRepository.getAllfriends(pagination);
-    const totalCount = await friendRepository.getfriendsCount();
+    const friends = await friendRepository.getAllFriends(userId, pagination);
+    const totalCount = await friendRepository.getFriendsCount();
 
     const totalPages = Math.ceil(totalCount / pagination.pageSize);
 
     return { friends, totalCount, totalPages };
   }
 
-  async getfriendById(friendId) {
-    return friendRepository.getfriendById(friendId);
+  async getFriendById(userId, friendId) {
+    return friendRepository.getFriendById(userId, friendId);
   }
 
-  async createfriend(friendData) {
-    return friendRepository.createfriend(friendData);
+  async createFriend(userId, friendData) {
+    return friendRepository.createFriend(userId, friendData);
   }
 
-  async updatefriend(friendId, friendData) {
-    return friendRepository.updatefriend(friendId, friendData);
+  async updateFriend(userId, friendId, friendData) {
+    return friendRepository.updateFriend(userId, friendId, friendData);
   }
 
-  async deletefriend(friendId) {
-    return friendRepository.deletefriend(friendId);
+  async deleteFriend(userId, friendId) {
+    return friendRepository.deleteFriend(userId, friendId);
   }
 
-  async searchfriends(queryParams, pagination) {
+  async searchFriends(userId, queryParams, pagination) {
     const searchCriteria = {};
 
-    // Aggiungo i criteri di ricerca solo per i parametri specificati
-    if (queryParams.name) {
-      searchCriteria.name = new RegExp(queryParams.name, 'i');
-    }
-    if (queryParams.type) {
-      searchCriteria.type = new RegExp(queryParams.type, 'i');
-    }
-    if (queryParams.address) {
-      searchCriteria.address = new RegExp(queryParams.address, 'i');
-    }
-    if (queryParams.phone) {
-      searchCriteria.phone = new RegExp(queryParams.phone, 'i');
-    }
-    if (queryParams.opening_hours) {
-      searchCriteria.opening_hours = new RegExp(queryParams.opening_hours, 'i');
-    }
+    // Mappa dei campi che possono essere utilizzati come criteri di ricerca
+    const searchFields = ['nickname'];
 
-    const friends = await friendRepository.searchfriends(searchCriteria, pagination);
-    const totalCount = await friendRepository.getfriendsCount(searchCriteria);
+    // Aggiungo i criteri di ricerca solo per i parametri specificati
+    searchFields.forEach(field => {
+        if (queryParams[field]) {
+            // Aggiungo il criterio con l'espressione regolare per la ricerca case-insensitive
+            searchCriteria[field] = new RegExp(queryParams[field], 'i');
+        }
+    });
+
+    // Recupero gli oggetti corrispondendi ai criteri di ricerca
+    const friends = await friendRepository.searchFriends(userId, searchCriteria, pagination);
+    
+    // Recupero il numero totale degli oggetti
+    const totalCount = await friendRepository.getFriendsCount(searchCriteria);
+    
+    // Calcolo il numero totale di pagine con totale/dimensione pagina
     const totalPages = Math.ceil(totalCount / pagination.pageSize);
 
     return { friends, totalCount, totalPages };

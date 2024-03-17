@@ -2,54 +2,53 @@
 const productRepository = require('../repositories/productRepository');
 
 class productService {
-  async getAllproducts(pagination) {
+  async getAllproducts(userId, pagination) {
 
-    const products = await productRepository.getAllproducts(pagination);
-    const totalCount = await productRepository.getproductsCount();
+    const products = await productRepository.getAllProducts(userId, pagination);
+    const totalCount = await productRepository.getProductsCount();
 
     const totalPages = Math.ceil(totalCount / pagination.pageSize);
 
     return { products, totalCount, totalPages };
   }
 
-  async getproductById(productId) {
-    return productRepository.getproductById(productId);
+  async getproductById(userId, productId) {
+    return productRepository.getProductById(userId, productId);
   }
 
-  async createproduct(productData) {
-    return productRepository.createproduct(productData);
+  async createproduct(userId, productData) {
+    return productRepository.createProduct(userId, productData);
   }
 
-  async updateproduct(productId, productData) {
-    return productRepository.updateproduct(productId, productData);
+  async updateproduct(userId, productId, productData) {
+    return productRepository.updateProduct(userId, productId, productData);
   }
 
-  async deleteproduct(productId) {
-    return productRepository.deleteproduct(productId);
+  async deleteproduct(userId, productId) {
+    return productRepository.deleteProduct(userId, productId);
   }
 
-  async searchproducts(queryParams, pagination) {
+  async searchproducts(userId, queryParams, pagination) {
     const searchCriteria = {};
 
-    // Aggiungo i criteri di ricerca solo per i parametri specificati
-    if (queryParams.name) {
-      searchCriteria.name = new RegExp(queryParams.name, 'i');
-    }
-    if (queryParams.type) {
-      searchCriteria.type = new RegExp(queryParams.type, 'i');
-    }
-    if (queryParams.address) {
-      searchCriteria.address = new RegExp(queryParams.address, 'i');
-    }
-    if (queryParams.phone) {
-      searchCriteria.phone = new RegExp(queryParams.phone, 'i');
-    }
-    if (queryParams.opening_hours) {
-      searchCriteria.opening_hours = new RegExp(queryParams.opening_hours, 'i');
-    }
+    // Mappa dei campi che possono essere utilizzati come criteri di ricerca
+    const searchFields = ['name', 'price', 'description', 'allergens'];
 
-    const products = await productRepository.searchproducts(searchCriteria, pagination);
-    const totalCount = await productRepository.getproductsCount(searchCriteria);
+    // Aggiungo i criteri di ricerca solo per i parametri specificati
+    searchFields.forEach(field => {
+        if (queryParams[field]) {
+            // Aggiungo il criterio con l'espressione regolare per la ricerca case-insensitive
+            searchCriteria[field] = new RegExp(queryParams[field], 'i');
+        }
+    });
+
+    // Recupero gli oggetti corrispondendi ai criteri di ricerca
+    const products = await productRepository.searchProducts(userId, searchCriteria, pagination);
+    
+    // Recupero il numero totale degli oggetti
+    const totalCount = await productRepository.getProductsCount(searchCriteria);
+    
+    // Calcolo il numero totale di pagine con totale/dimensione pagina
     const totalPages = Math.ceil(totalCount / pagination.pageSize);
 
     return { products, totalCount, totalPages };

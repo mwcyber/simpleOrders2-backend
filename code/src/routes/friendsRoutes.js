@@ -4,11 +4,11 @@ const friendController = require('../controllers/friendController');
 
 const router = express.Router();
 
-router.get('/', friendController.getAllfriends);
-router.get('/:id', friendController.getfriendById);
-router.post('/', friendController.createfriend);
-router.put('/:id', friendController.updatefriend);
-router.delete('/:id', friendController.deletefriend);
-router.post('/search', friendController.searchfriends);
+router.get('/', friendController.getAllFriends);
+router.get('/:id', friendController.getFriendById);
+router.post('/', friendController.createFriend);
+router.put('/:id', friendController.updateFriend);
+router.delete('/:id', friendController.deleteFriend);
+router.post('/search', friendController.searchFriends);
 
 module.exports = router;

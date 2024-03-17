@@ -2,14 +2,15 @@
 const mongoose = require('mongoose');
 
 const barSchema = new mongoose.Schema({
-  bar_id: String,
-  name: String,
-  type: String,
-  address: String,
-  phone: String,
-  opening_hours: String,
-  user_id: String,
-  share: Boolean,
+    name: { type: String, required: true },
+    type: { type: String, required: true },
+    address: { type: String, required: true },
+    phone: { type: String, required: true },
+    openingHours: { type: String, required: true },
+    userId: { type: String, required: true },
+    share: { type: Boolean, required: true }
 });
 
-module.exports = mongoose.model('Bar', barSchema);
+const Bar = mongoose.model('Bar', barSchema); // 'Bar' è il nome del modello e barSchema è lo schema che hai definito
+
+module.exports = Bar;
