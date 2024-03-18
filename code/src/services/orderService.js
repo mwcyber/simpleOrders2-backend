@@ -5,7 +5,7 @@ class orderService {
   async getAllOrders(userId, pagination) {
 
     const orders = await orderRepository.getAllOrders(userId, pagination);
-    const totalCount = await orderRepository.getOrdersCount();
+    const totalCount = await orderRepository.getOrdersCount(userId);
 
     const totalPages = Math.ceil(totalCount / pagination.pageSize);
 
@@ -16,9 +16,9 @@ class orderService {
     return orderRepository.getOrderById(userId, orderId);
   }
 
-  async createOrder(orderData) {
+  async createOrder(userId, orderData) {
     try {
-      const { userId, barId, orders } = orderData;
+      const { barId, orders } = orderData;
       const createdOrders = [];
   
       for (const order of orders) {

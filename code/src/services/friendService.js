@@ -5,7 +5,7 @@ class friendService {
   async getAllfriends(userId, pagination) {
 
     const friends = await friendRepository.getAllFriends(userId, pagination);
-    const totalCount = await friendRepository.getFriendsCount();
+    const totalCount = await friendRepository.getFriendsCount(userId);
 
     const totalPages = Math.ceil(totalCount / pagination.pageSize);
 
@@ -17,7 +17,8 @@ class friendService {
   }
 
   async createFriend(userId, friendData) {
-    return friendRepository.createFriend(userId, friendData);
+    friendData.userId = userId;
+    return friendRepository.createFriend(friendData);
   }
 
   async updateFriend(userId, friendId, friendData) {

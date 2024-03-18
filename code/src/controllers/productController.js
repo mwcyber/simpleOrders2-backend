@@ -3,11 +3,12 @@ const productService = require('../services/productService');
 
 class productController {
     async getAllproducts(req, res) {
+        const userId = req.user.userId;
         const { page = 1, pageSize = 50 } = req.query;
         const pagination = { page: parseInt(page), pageSize: parseInt(pageSize) };
 
         try {
-            const { products, totalCount, totalPages } = await productService.getAllproducts(pagination);
+            const { products, totalCount, totalPages } = await productService.getAllproducts(userId, pagination);
 
             if (products.length === 0) {
                 res.status(404).json({ message: 'products not found' });
@@ -32,9 +33,10 @@ class productController {
     }
 
     async getProductById(req, res) {
+        const userId = req.user.userId;
         const { id } = req.params;
         try {
-            const product = await productService.getProductById(id);
+            const product = await productService.getProductById(userId, id);
             if (product.length === 0) {
                 res.status(404).json({ message: 'products not found' });
             } else {
@@ -46,30 +48,33 @@ class productController {
     }
 
     async createProduct(req, res) {
+        const userId = req.user.userId;
         const productData = req.body;
         try {
-            const createdproduct = await productService.createProduct(productData);
-            res.status(201).json(createdproduct);
+            const createdProduct = await productService.createProduct(userId, productData);
+            res.status(201).json(createdProduct);
         } catch (error) {
-            res.status(400).json({ message: 'Error creating product' });
+            res.status(400).json({ message: 'Error creating product' + error});
         }
     }
 
     async updateProduct(req, res) {
+        const userId = req.user.userId;
         const { id } = req.params;
         const productData = req.body;
         try {
-            const updatedproduct = await productService.updateProduct(id, productData);
-            res.status(200).json(updatedproduct);
+            const updatedProduct = await productService.updateProduct(userId, id, productData);
+            res.status(200).json(updatedProduct);
         } catch (error) {
             res.status(404).json({ message: 'product not found' });
         }
     }
 
     async deleteProduct(req, res) {
+        const userId = req.user.userId;
         const { id } = req.params;
         try {
-            await productService.deleteProduct(id);
+            await productService.deleteProduct(userId, id);
             res.status(204).send();
         } catch (error) {
             res.status(404).json({ message: 'product not found' });
@@ -77,6 +82,7 @@ class productController {
     }
 
     async searchProducts(req, res) {
+        const userId = req.user.userId;
         const { page = 1, pageSize = 50 } = req.query;
         const { name, type, address, phone, openingHours } = req.body;
 
@@ -86,7 +92,7 @@ class productController {
         // Verifica che almeno un parametro di ricerca sia presente
         if (Object.values(queryParams).some(value => value !== undefined)) {
             try {
-                const { products, totalCount, totalPages } = await productService.searchProducts(queryParams, pagination);
+                const { products, totalCount, totalPages } = await productService.searchProducts(userId, queryParams, pagination);
 
                 if (products.length === 0) {
                     res.status(404).json({ message: 'No products found matching the search criteria' });

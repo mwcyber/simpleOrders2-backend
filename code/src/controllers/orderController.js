@@ -48,10 +48,11 @@ class orderController {
     }
 
     async createOrder(req, res) {
+        const userId = req.user.userId;
         const orderData = req.body;
         try {
-            const createdorder = await orderService.creatOrder(orderData);
-            res.status(201).json(createdorder);
+            const createdOrder = await orderService.createOrder(userId, orderData);
+            res.status(201).json(createdOrder);
         } catch (error) {
             res.status(400).json({ message: 'Error creating order' });
         }

@@ -5,7 +5,7 @@ class BarService {
   async getAllBars(userId, pagination) {
 
     const bars = await barRepository.getAllBars(userId, pagination);
-    const totalCount = await barRepository.getBarsCount();
+    const totalCount = await barRepository.getBarsCount(userId);
 
     const totalPages = Math.ceil(totalCount / pagination.pageSize);
 
@@ -16,7 +16,8 @@ class BarService {
     return barRepository.getBarById(userId, barId);
   }
 
-  async createBar(barData) {
+  async createBar(userId, barData) {
+    barData.userId = userId;
     return barRepository.createBar(barData);
   }
 
@@ -41,12 +42,12 @@ class BarService {
             searchCriteria[field] = new RegExp(queryParams[field], 'i');
         }
     });
-
+    
     // Recupero gli oggetti corrispondendi ai criteri di ricerca
     const bars = await barRepository.searchBars(userId, searchCriteria, pagination);
     
     // Recupero il numero totale degli oggetti
-    const totalCount = await barRepository.getBarsCount(searchCriteria);
+    const totalCount = await barRepository.getBarsCount(userId);
     
     // Calcolo il numero totale di pagine con totale/dimensione pagina
     const totalPages = Math.ceil(totalCount / pagination.pageSize);

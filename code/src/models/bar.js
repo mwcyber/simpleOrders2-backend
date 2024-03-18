@@ -8,7 +8,7 @@ const barSchema = new mongoose.Schema({
     phone: { type: String, required: true },
     openingHours: { type: String, required: true },
     userId: { type: String, required: true },
-    share: { type: Boolean, required: true }
+    share: { type: Boolean, default: false, required: true }
 });
 
 const Bar = mongoose.model('Bar', barSchema); // 'Bar' è il nome del modello e barSchema è lo schema che hai definito

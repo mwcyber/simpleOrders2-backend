@@ -9,7 +9,7 @@ class BarController {
 
         try {
             const { bars, totalCount, totalPages } = await barService.getAllBars(userId, pagination);
-
+            console.log(totalCount, totalPages);
             if (bars.length === 0) {
                 res.status(404).json({ message: 'Bars not found' });
             } else {
@@ -48,9 +48,10 @@ class BarController {
     }
 
     async createBar(req, res) {
+        const userId = req.user.userId;
         const barData = req.body;
         try {
-            const createdBar = await barService.createBar(barData);
+            const createdBar = await barService.createBar(userId, barData);
             res.status(201).json(createdBar);
         } catch (error) {
             res.status(400).json({ message: 'Error creating bar' + error});

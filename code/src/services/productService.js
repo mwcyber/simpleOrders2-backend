@@ -5,30 +5,32 @@ class productService {
   async getAllproducts(userId, pagination) {
 
     const products = await productRepository.getAllProducts(userId, pagination);
-    const totalCount = await productRepository.getProductsCount();
+    const totalCount = await productRepository.getProductsCount(userId);
 
     const totalPages = Math.ceil(totalCount / pagination.pageSize);
 
     return { products, totalCount, totalPages };
   }
 
-  async getproductById(userId, productId) {
+  async getProductById(userId, productId) {
     return productRepository.getProductById(userId, productId);
   }
 
-  async createproduct(userId, productData) {
-    return productRepository.createProduct(userId, productData);
+  async createProduct(userId, productData) {
+    productData.userId = userId;
+    console.log(productData);
+    return productRepository.createProduct(productData);
   }
 
-  async updateproduct(userId, productId, productData) {
+  async updateProduct(userId, productId, productData) {
     return productRepository.updateProduct(userId, productId, productData);
   }
 
-  async deleteproduct(userId, productId) {
+  async deleteProduct(userId, productId) {
     return productRepository.deleteProduct(userId, productId);
   }
 
-  async searchproducts(userId, queryParams, pagination) {
+  async searchProducts(userId, queryParams, pagination) {
     const searchCriteria = {};
 
     // Mappa dei campi che possono essere utilizzati come criteri di ricerca
