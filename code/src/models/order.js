@@ -6,9 +6,11 @@ const orderSchema = new mongoose.Schema({
   modifiedAt: { type: Date, default: Date.now },
   userId: { type: String, required: true },
   barId: { type: String, required: true },
+  order: [{
   productId: { type: String, required: true },
   friendId: { type: String, required: true },
   quantity: { type: Number, required: true }
+  }]
 });
 
 const Order = mongoose.model('Order', orderSchema);

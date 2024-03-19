@@ -37,7 +37,6 @@ class BarRepository {
   }
 
   async searchBars(userId, searchCriteria, pagination) {
-    console.log(searchCriteria);
     return Bar.find({ userId, ...searchCriteria })
       .skip((pagination.page - 1) * pagination.pageSize)
       .limit(pagination.pageSize);

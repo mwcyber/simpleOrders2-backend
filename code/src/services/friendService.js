@@ -47,7 +47,7 @@ class friendService {
     const friends = await friendRepository.searchFriends(userId, searchCriteria, pagination);
     
     // Recupero il numero totale degli oggetti
-    const totalCount = await friendRepository.getFriendsCount(searchCriteria);
+    const totalCount = await friendRepository.getFriendsCount(userId);
     
     // Calcolo il numero totale di pagine con totale/dimensione pagina
     const totalPages = Math.ceil(totalCount / pagination.pageSize);

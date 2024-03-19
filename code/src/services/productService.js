@@ -48,7 +48,7 @@ class productService {
     const products = await productRepository.searchProducts(userId, searchCriteria, pagination);
     
     // Recupero il numero totale degli oggetti
-    const totalCount = await productRepository.getProductsCount(searchCriteria);
+    const totalCount = await productRepository.getProductsCount(userId);
     
     // Calcolo il numero totale di pagine con totale/dimensione pagina
     const totalPages = Math.ceil(totalCount / pagination.pageSize);

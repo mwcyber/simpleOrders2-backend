@@ -81,6 +81,7 @@ class orderController {
     }
 
     async searchOrders(req, res) {
+        const authUserId = req.user.userId;
         const { page = 1, pageSize = 50 } = req.query;
         const { orderId, userId, createdAt, modifiedAt, barId, productId, friendId, quantity } = req.body;
 
@@ -90,7 +91,7 @@ class orderController {
         // Verifica che almeno un parametro di ricerca sia presente
         if (Object.values(queryParams).some(value => value !== undefined)) {
             try {
-                const { orders, totalCount, totalPages } = await orderService.searchOrders(queryParams, pagination);
+                const { orders, totalCount, totalPages } = await orderService.searchOrders(authUserId, queryParams, pagination);
 
                 if (orders.length === 0) {
                     res.status(404).json({ message: 'No orders found matching the search criteria' });

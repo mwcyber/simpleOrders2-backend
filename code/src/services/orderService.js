@@ -17,21 +17,8 @@ class orderService {
   }
 
   async createOrder(userId, orderData) {
-    try {
-      const { barId, orders } = orderData;
-      const createdOrders = [];
-  
-      for (const order of orders) {
-        const { productId, friendId, quantity } = order;
-        const newOrder = { userId, barId, productId, friendId, quantity };
-        const createdOrder = await orderRepository.createOrder(newOrder);
-        createdOrders.push(createdOrder);
-      }
-  
-      return createdOrders;
-    } catch (error) {
-      throw error;
-    }
+    orderData.userId = userId;
+    return orderRepository.createOrder(orderData);
   }
 
   async updateOrder(userId, orderId, orderData) {
@@ -42,7 +29,7 @@ class orderService {
     return orderRepository.deleteOrder(userId, orderId);
   }
 
-  async searchOrders(userId, queryParams, pagination) {
+  async searchOrders(authUserId, queryParams, pagination) {
     const searchCriteria = {};
 
     // Mappa dei campi che possono essere utilizzati come criteri di ricerca
@@ -57,10 +44,10 @@ class orderService {
     });
 
     // Recupero gli oggetti corrispondendi ai criteri di ricerca
-    const orders = await orderRepository.searchOrders(userId, searchCriteria, pagination);
+    const orders = await orderRepository.searchOrders(authUserId, searchCriteria, pagination);
 
     // Recupero il numero totale degli oggetti
-    const totalCount = await orderRepository.getOrdersCount(searchCriteria);
+    const totalCount = await orderRepository.getOrdersCount(authUserId);
     
     // Calcolo il numero totale di pagine con totale/dimensione pagina
     const totalPages = Math.ceil(totalCount / pagination.pageSize);
